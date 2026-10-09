@@ -1990,6 +1990,110 @@ server.on('upgrade', (req, socket, head) => {
 // 12. 前端视图模版渲染 (微测网风格 + Element UI)
 // ==========================================
 function renderHomepage(currentUser) {
+    if (!currentUser) {
+        return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小孙的数字日记 - 个人博客</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; color: #333; line-height: 1.6; margin: 0; padding: 0; }
+        header { background: #fff; padding: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; }
+        header h1 { margin: 0; font-size: 24px; color: #2c3e50; }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .post { background: #fff; border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .post h2 { margin-top: 0; color: #2c3e50; }
+        .post-meta { font-size: 13px; color: #95a5a6; margin-bottom: 15px; }
+        footer { text-align: center; padding: 30px; font-size: 13px; color: #7f8c8d; }
+        .hidden-links a { color: #ecf0f1; text-decoration: none; margin: 0 10px; font-size: 12px; transition: color 0.3s; cursor: pointer; }
+        .hidden-links a:hover { color: #bdc3c7; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .modal-content h3 { margin-top: 0; font-size: 18px; margin-bottom: 20px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 10px; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #2980b9; }
+        .close { float: right; cursor: pointer; color: #999; font-size: 20px; margin-top: -5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小孙的数字日记</h1>
+    </header>
+    <div class="container">
+        <div class="post">
+            <h2>记录生活的一天</h2>
+            <div class="post-meta">发布于 2024-05-12 | 分类：随笔</div>
+            <p>今天天气不错，去楼下的小咖啡馆坐了一个下午。看着窗外的车水马龙，感觉时间过得真快。最近在学习一些新知识，虽然有点累，但也很充实。希望能一直保持这份好奇心，探索更多未知的领域。</p>
+            <p>明天计划去爬山，呼吸一下新鲜空气。周末的时光总是那么短暂，要好好珍惜才行。</p>
+        </div>
+        <div class="post">
+            <h2>关于我的博客搭建之旅</h2>
+            <div class="post-meta">发布于 2024-04-28 | 分类：技术</div>
+            <p>经过几天的折腾，终于把自己的个人博客搭建起来了。选择了一个极简的主题，只为了能安静地写字。以后这里就是我的小天地啦，欢迎大家常来做客！</p>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 小孙的数字日记. All rights reserved.</p>
+        <div class="hidden-links">
+            <a onclick="showModal('user-modal')">User Login</a>
+            <a onclick="showModal('admin-modal')">Admin</a>
+        </div>
+    </footer>
+
+    <!-- User Login Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('user-modal')">&times;</span>
+            <h3>用户登录</h3>
+            <div class="form-group"><input type="text" id="username" placeholder="账号"></div>
+            <div class="form-group"><input type="password" id="password" placeholder="密码"></div>
+            <button class="btn" onclick="userLogin()">登录</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('admin-modal')">&times;</span>
+            <h3>后台登录</h3>
+            <div class="form-group"><input type="password" id="admin-password" placeholder="管理员密码"></div>
+            <button class="btn" onclick="adminLogin()">登录</button>
+        </div>
+    </div>
+
+    <script>
+        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function hideModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        async function userLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            if (res.ok) { location.reload(); } else { alert('登录失败: 账号或密码不正确'); }
+        }
+
+        async function adminLogin() {
+            const p = document.getElementById('admin-password').value;
+            const res = await fetch('/admin/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: p })
+            });
+            if (res.ok) { location.href = '/admin'; } else { alert('密码错误'); }
+        }
+    </script>
+</body>
+</html>`;
+    }
     const cf = siteSettings.cfNodes;
     const subUrl = currentUser ? `/sub?token=${currentUser.uuid}` : '';
     const trafficPercent = currentUser ? Math.min(100, Math.round((currentUser.trafficUsed / currentUser.trafficLimit) * 100)) : 0;
